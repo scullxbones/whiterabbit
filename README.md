@@ -1,4 +1,4 @@
-Whiterabbit
+White Rabbit
 ===========
 
 A diagnostic system inspired by dogslow: https://bitbucket.org/evzijst/dogslow 
