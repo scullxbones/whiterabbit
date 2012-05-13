@@ -24,7 +24,7 @@ public class Rabbit {
 		Builder withSize(int wheelSize);
 		Builder usingThreadFactory(ThreadFactory factory);
 		Builder reportingTo(Reporter reporter);
-		Rabbit build();
+		Rabbit buildAndStart();
 	}
 	
 	private static class InternalBuilder implements Builder {
@@ -68,7 +68,7 @@ public class Rabbit {
 		}
 		
 		@Override
-		public Rabbit build() {
+		public Rabbit buildAndStart() {
 			return new Rabbit(new HashedWheelTimer(factory,tickDuration,unit,wheelSize), reporter).start();
 		}
 		

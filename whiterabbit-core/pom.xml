@@ -3,12 +3,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.scullxbones</groupId>
-  <artifactId>whiterabbit</artifactId>
+  <artifactId>whiterabbit-core</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
-  <name>whiterabbit</name>
+  <name>whiterabbit-core</name>
   <url>http://maven.apache.org</url>
+
+  <parent>
+    <groupId>com.github.scullxbones</groupId>
+    <artifactId>whiterabbit</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,13 +34,6 @@
     </plugins>
   </build>
 
-  <modules>
-    <module>whiterabbit-core</module>
-    <module>whiterabbit-reporter-slf4j</module>
-    <module>whiterabbit-trigger-web</module>
-    <module>whiterabbit-trigger-spring</module>
-    <module>whiterabbit-trigger-guice</module>
-  </modules>
 
   <dependencies>
     <dependency>
