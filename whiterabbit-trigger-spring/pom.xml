@@ -52,5 +52,10 @@
       <version>1.6.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>${pom.groupId}</groupId>
+      <artifactId>whiterabbit-core</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
   </dependencies>
 </project>

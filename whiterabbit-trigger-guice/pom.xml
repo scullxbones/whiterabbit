@@ -36,6 +36,16 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>3.0</version>
+    </dependency> 
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency> 
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
@@ -57,6 +67,11 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.6.4</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${pom.groupId}</groupId>
+      <artifactId>whiterabbit-core</artifactId>
+      <version>${pom.version}</version>
     </dependency>
   </dependencies>
 </project>
