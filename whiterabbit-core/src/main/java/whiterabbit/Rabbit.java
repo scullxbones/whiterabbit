@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import whiterabbit.io.netty.util.HashedWheelTimer;
 import whiterabbit.io.netty.util.Timeout;
@@ -17,9 +19,13 @@ public class Rabbit {
 	
 	private final Reporter reporter;
 	
+	private static final Builder builder = new InternalBuilder();
+	private static final AtomicReference<Rabbit> instanceRef = new AtomicReference<Rabbit>();
+	private final HashedWheelTimer timer;
+	
 	public interface Builder 
 	{
-		Builder withTicks(long tick);
+		Builder withTickLength(long tick);
 		Builder ofUnit(TimeUnit unit);
 		Builder withSize(int wheelSize);
 		Builder usingThreadFactory(ThreadFactory factory);
@@ -38,7 +44,7 @@ public class Rabbit {
 		private InternalBuilder() {}
 
 		@Override
-		public Builder withTicks(long tick) {
+		public Builder withTickLength(long tick) {
 			this.tickDuration = tick;
 			return this;
 		}
@@ -69,17 +75,21 @@ public class Rabbit {
 		
 		@Override
 		public Rabbit buildAndStart() {
-			return new Rabbit(new HashedWheelTimer(factory,tickDuration,unit,wheelSize), reporter).start();
+			Rabbit instance = 
+					new Rabbit(
+							new HashedWheelTimer(factory,tickDuration,unit,wheelSize), reporter)
+								.start();
+			Rabbit oldInstance = instanceRef.getAndSet(instance);
+			if (oldInstance != null)
+				oldInstance.stop();
+			return instance;
 		}
 		
 	}
 	
 	public static final Builder builder() {
-		return new InternalBuilder();
+		return builder;
 	}
-	
-	
-	private final HashedWheelTimer timer;
 	
 	private Rabbit(HashedWheelTimer timer, Reporter reporter)
 	{
@@ -87,7 +97,7 @@ public class Rabbit {
 		this.reporter = reporter;
 	}
 	
-	public Rabbit start()
+	private Rabbit start()
 	{
 		timer.start();
 		return this;
@@ -99,18 +109,38 @@ public class Rabbit {
 		return this;
 	}
 	
-	public Rabbit registerTimeout(long delay, TimeUnit unit)
-	{
-		timer.newTimeout(new ThreadDumpTimerTask(Thread.currentThread(), delay, unit), delay, unit);
-		return this;
+	public interface Cancelable {
+		void cancel();
 	}
 	
-	private class ThreadDumpTimerTask implements TimerTask 
+	public Cancelable registerTimeout(long delay, TimeUnit unit)
 	{
-		
+		ThreadDumpTimerTask task = 
+				new ThreadDumpTimerTask(Thread.currentThread(), delay, unit);
+		timer.newTimeout(task, delay, unit);
+		return new CancelableHandle(task);
+	}
+	
+	private class CancelableHandle implements Cancelable {
+		private final Cancelable delegate;
+
+		private CancelableHandle(Cancelable delegate)
+		{
+			this.delegate = delegate;
+		}
+
+		@Override
+		public void cancel() {
+			delegate.cancel();
+		}
+	}
+	
+	private class ThreadDumpTimerTask implements TimerTask, Cancelable
+	{
 		private final Thread toDump;
 		private final long delay;
 		private final TimeUnit unit;
+		private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
 		public ThreadDumpTimerTask(Thread toDump, long delay, TimeUnit unit)
 		{
@@ -122,10 +152,15 @@ public class Rabbit {
 		@Override
 		public void run(Timeout timeout) throws Exception
 		{
-			if (timeout.isExpired())
+			if (timeout.isExpired() && !cancelled.get())
 			{
 				reporter.reportTimeout(Arrays.asList(toDump.getStackTrace()), toDump, delay, unit);
 			}
+		}
+
+		@Override
+		public void cancel() {
+			cancelled.set(true);
 		}
 		
 	}

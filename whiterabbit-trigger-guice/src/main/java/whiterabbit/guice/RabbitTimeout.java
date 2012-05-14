@@ -4,4 +4,8 @@ import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME) 
 @Target(ElementType.METHOD)
-public @interface RabbitTimeout {}
+public @interface RabbitTimeout {
+	
+	long value() default 0; 
+	
+}
