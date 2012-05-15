@@ -17,14 +17,18 @@ public class RabbitFilter implements Filter {
 	
 	public void init(FilterConfig filterConfig) 
 	{
+		//TODO: specify reporter
+		//TODO: options for tick length and wheel size?
 		rabbit = Rabbit.builder().buildAndStart();
+		
 		String to = filterConfig.getInitParameter(TIMEOUT_INIT_PARAMETER);
 		if (to == null)
 			throw new IllegalStateException(TIMEOUT_INIT_PARAMETER+" must be specified as an init-param");
+		timeout = Long.parseLong(to);
+		
 		String unit = filterConfig.getInitParameter(TIMEUNIT_INIT_PARAMETER);
 		if (unit != null)
 			this.unit = TimeUnit.valueOf(unit.toUpperCase());
-		timeout = Long.parseLong(to);
 	}
  
  	public void destroy()
@@ -34,7 +38,7 @@ public class RabbitFilter implements Filter {
 
  	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
  	{
- 		Cancelable cancelable = rabbit.registerTimeout(timeout,TimeUnit.SECONDS);
+ 		Cancelable cancelable = rabbit.registerTimeout(timeout,unit);
  		try {
 	 		chain.doFilter(request,response);
  		}

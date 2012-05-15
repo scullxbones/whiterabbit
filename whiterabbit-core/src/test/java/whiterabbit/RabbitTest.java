@@ -6,36 +6,14 @@ import org.junit.After;
 
 import whiterabbit.Rabbit.Cancelable;
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.CountDownLatch;
-import java.util.List;
 
 public class RabbitTest {
 
 	private Rabbit rabbit;
 	private TestReporter mockReporter = new TestReporter();
-
-	public static class TestReporter implements Reporter {
-
-		private CountDownLatch latch = new CountDownLatch(1);
-		private Thread toDump;
-		private long delay;
-		private TimeUnit unit;
-
-		public void reportTimeout(List<StackTraceElement> list, Thread toDump, long delay, TimeUnit unit)
-		{
-			this.toDump = toDump;
-			this.delay = delay;
-			this.unit = unit;
-			latch.countDown();
-		}
-
-		public void await() throws InterruptedException
-		{
-			latch.await();
-		}
-	}
 
 	@Before
 	public void setUp()
@@ -55,10 +33,14 @@ public class RabbitTest {
 	public void testTimeout() throws Exception
 	{
 		rabbit.registerTimeout(50,TimeUnit.MILLISECONDS);
-		mockReporter.await();
-		assertEquals(Thread.currentThread(),mockReporter.toDump);
-		assertEquals(50L,mockReporter.delay);
-		assertEquals(TimeUnit.MILLISECONDS,mockReporter.unit);
+		assertThat(mockReporter.await(100),is(true));
+		assertReportWasCalled(mockReporter,50);
+	}
+
+	public static void assertReportWasCalled(TestReporter reporter, long delay) {
+		assertEquals(Thread.currentThread(),reporter.toDump);
+		assertEquals(delay,reporter.delay);
+		assertEquals(TimeUnit.MILLISECONDS,reporter.unit);
 	}
 	
 	@Test
