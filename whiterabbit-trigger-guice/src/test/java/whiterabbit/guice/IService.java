@@ -1,5 +1,7 @@
 package whiterabbit.guice;
 
+import whiterabbit.RabbitTimeout;
+
 public interface IService {
 
 	@RabbitTimeout(100)

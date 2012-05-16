@@ -3,6 +3,7 @@ package whiterabbit.guice;
 import java.util.concurrent.TimeUnit;
 
 import whiterabbit.Rabbit;
+import whiterabbit.RabbitTimeout;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;

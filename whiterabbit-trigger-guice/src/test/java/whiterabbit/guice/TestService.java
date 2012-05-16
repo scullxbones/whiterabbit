@@ -1,5 +1,7 @@
 package whiterabbit.guice;
 
+import whiterabbit.RabbitTimeout;
+
 
 public class TestService implements IService {
 

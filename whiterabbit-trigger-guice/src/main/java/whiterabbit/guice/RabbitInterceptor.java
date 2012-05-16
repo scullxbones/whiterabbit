@@ -6,6 +6,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import whiterabbit.Rabbit;
+import whiterabbit.RabbitTimeout;
 import whiterabbit.Rabbit.Cancelable;
 
 public class RabbitInterceptor implements MethodInterceptor {

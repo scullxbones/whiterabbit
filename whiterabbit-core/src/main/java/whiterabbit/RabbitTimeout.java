@@ -1,4 +1,4 @@
-package whiterabbit.guice;
+package whiterabbit;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;

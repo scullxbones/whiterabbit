@@ -1,6 +1,5 @@
 package whiterabbit;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -11,11 +10,11 @@ public class TestReporter implements Reporter {
 	public long delay;
 	public TimeUnit unit;
 
-	public void reportTimeout(List<StackTraceElement> list, Thread toDump, long delay, TimeUnit unit)
+	public void reportTimeout(ReportContext context)
 	{
-		this.toDump = toDump;
-		this.delay = delay;
-		this.unit = unit;
+		this.toDump = context.getToDump();
+		this.delay = context.getDelay();
+		this.unit = context.getUnit();
 		latch.countDown();
 	}
 

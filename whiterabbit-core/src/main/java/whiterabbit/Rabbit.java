@@ -1,6 +1,7 @@
 package whiterabbit;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -116,7 +117,23 @@ public class Rabbit {
 	public Cancelable registerTimeout(long delay, TimeUnit unit)
 	{
 		ThreadDumpTimerTask task = 
-				new ThreadDumpTimerTask(Thread.currentThread(), delay, unit);
+				new ThreadDumpTimerTask(null,null,Thread.currentThread(), delay, unit);
+		timer.newTimeout(task, delay, unit);
+		return new CancelableHandle(task);
+	}
+	
+	public Cancelable registerTimeoutWithName(String name, long delay, TimeUnit unit)
+	{
+		ThreadDumpTimerTask task = 
+				new ThreadDumpTimerTask(name,null,Thread.currentThread(), delay, unit);
+		timer.newTimeout(task, delay, unit);
+		return new CancelableHandle(task);
+	}
+	
+	public Cancelable registerTimeoutWithContext(String name, Map<String,Object> context, long delay, TimeUnit unit)
+	{
+		ThreadDumpTimerTask task = 
+				new ThreadDumpTimerTask(name, context, Thread.currentThread(), delay, unit);
 		timer.newTimeout(task, delay, unit);
 		return new CancelableHandle(task);
 	}
@@ -141,9 +158,13 @@ public class Rabbit {
 		private final long delay;
 		private final TimeUnit unit;
 		private final AtomicBoolean cancelled = new AtomicBoolean(false);
+		private final Map<String, Object> context;
+		private final String name;
 
-		public ThreadDumpTimerTask(Thread toDump, long delay, TimeUnit unit)
+		public ThreadDumpTimerTask(String name, Map<String,Object> context, Thread toDump, long delay, TimeUnit unit)
 		{
+			this.name = name;
+			this.context = context;
 			this.toDump = toDump;
 			this.delay = delay;
 			this.unit = unit;
@@ -154,7 +175,9 @@ public class Rabbit {
 		{
 			if (timeout.isExpired() && !cancelled.get())
 			{
-				reporter.reportTimeout(Arrays.asList(toDump.getStackTrace()), toDump, delay, unit);
+				ReportContext ctx = 
+						new ReportContext(name,context,Arrays.asList(toDump.getStackTrace()), toDump, delay, unit);
+				reporter.reportTimeout(ctx);
 			}
 		}
 
