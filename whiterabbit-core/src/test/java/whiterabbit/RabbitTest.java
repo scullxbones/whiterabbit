@@ -8,6 +8,7 @@ import whiterabbit.Rabbit.Cancelable;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class RabbitTest {
@@ -50,6 +51,30 @@ public class RabbitTest {
 		to.cancel();
 		Thread.sleep(50);
 		assertEquals(1,mockReporter.latch.getCount());
+	}
+	
+	public class Sleeper implements Callable<Long> {
+		
+		private final long howLong;
+
+		public Sleeper(long howLong)
+		{
+			this.howLong = howLong;
+		}
+
+		@Override
+		public Long call() throws Exception {
+			Thread.sleep(howLong);
+			return howLong;
+		}
+		
+	}
+	
+	@Test
+	public void testCallWithTimeout() throws Exception
+	{
+		rabbit.wrapCallableWithTimeout(new Sleeper(100), 50, TimeUnit.MILLISECONDS).call();
+		assertReportWasCalled(mockReporter,50);
 	}
 	
 }
