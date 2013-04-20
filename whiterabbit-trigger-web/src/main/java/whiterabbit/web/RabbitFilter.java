@@ -14,14 +14,17 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import whiterabbit.Cancelable;
+import whiterabbit.Delay;
 import whiterabbit.Rabbit;
-import whiterabbit.Rabbit.Cancelable;
 import whiterabbit.Reporter;
+import whiterabbit.impl.RabbitImpl;
 
 public class RabbitFilter implements Filter {
 
@@ -122,7 +125,7 @@ public class RabbitFilter implements Filter {
 		if (wheelSizeParam != null)
 			wheelSize = Integer.parseInt(wheelSizeParam);
 			
-		rabbit = Rabbit.builder()
+		rabbit = RabbitImpl.builder()
 								.withSize(wheelSize)
 								.withTickLength(tickLength)
 								.ofUnit(tickUnit)
@@ -146,7 +149,14 @@ public class RabbitFilter implements Filter {
 
  	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
  	{
- 		Cancelable cancelable = rabbit.registerTimeout(timeout,unit);
+ 		Cancelable.Builder builder = rabbit.register().timeout(Delay.of(timeout,unit));
+ 		
+ 		if (request instanceof HttpServletRequest) {
+ 			HttpServletRequest rq = (HttpServletRequest)request;
+ 			builder.named(rq.getRequestURI());
+ 		}
+ 				
+ 		Cancelable cancelable =	builder.build();
  		try {
 	 		chain.doFilter(request,response);
  		}

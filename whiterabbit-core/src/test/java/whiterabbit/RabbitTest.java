@@ -4,7 +4,8 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 
-import whiterabbit.Rabbit.Cancelable;
+import whiterabbit.impl.RabbitImpl;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -19,7 +20,7 @@ public class RabbitTest {
 	@Before
 	public void setUp()
 	{
-		rabbit = Rabbit.builder()
+		rabbit = RabbitImpl.builder()
 									 .withTickLength(10)
 									 .reportingTo(mockReporter).buildAndStart();
 	}
@@ -33,7 +34,7 @@ public class RabbitTest {
 	@Test
 	public void testTimeout() throws Exception
 	{
-		rabbit.registerTimeout(50,TimeUnit.MILLISECONDS);
+		rabbit.register().timeout(Delay.millis(50)).build();
 		assertThat(mockReporter.await(100),is(true));
 		assertReportWasCalled(mockReporter,50);
 	}
@@ -47,7 +48,7 @@ public class RabbitTest {
 	@Test
 	public void testCancel() throws Exception
 	{
-		Cancelable to = rabbit.registerTimeout(50,TimeUnit.MILLISECONDS);
+		Cancelable to = rabbit.register().timeout(Delay.millis(50)).build();
 		to.cancel();
 		Thread.sleep(50);
 		assertEquals(1,mockReporter.latch.getCount());
@@ -73,7 +74,7 @@ public class RabbitTest {
 	@Test
 	public void testCallWithTimeout() throws Exception
 	{
-		rabbit.wrapCallableWithTimeout(new Sleeper(100), 50, TimeUnit.MILLISECONDS).call();
+		rabbit.wrap(new Sleeper(100)).timeout(Delay.millis(50)).build().call();
 		assertReportWasCalled(mockReporter,50);
 	}
 	

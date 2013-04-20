@@ -12,6 +12,7 @@ import org.junit.Test;
 import whiterabbit.Rabbit;
 import whiterabbit.RabbitTest;
 import whiterabbit.TestReporter;
+import whiterabbit.impl.RabbitImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -36,7 +37,7 @@ public class InterceptorTest {
 	@Before
  	public void setUp()
 	{
-		rabbit = Rabbit.builder().reportingTo(testReporter).withTickLength(50).buildAndStart();
+		rabbit = RabbitImpl.builder().reportingTo(testReporter).withTickLength(50).buildAndStart();
 		rabbitMod = new RabbitModule(rabbit,100,TimeUnit.MILLISECONDS);
 	}
 	

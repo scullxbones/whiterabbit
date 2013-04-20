@@ -9,19 +9,17 @@ public class ReportContext {
 	private final Map<String,Object> context;
 	private final List<StackTraceElement> list;
 	private final Thread toDump; 
-	private final long delay;
-	private final TimeUnit unit;
+	private final Delay delay;
 	
 	public ReportContext(String name, Map<String,Object> context, 
 			List<StackTraceElement> list,
-			Thread toDump, long delay, TimeUnit unit)
+			Thread toDump, Delay delay)
 	{
 		this.name = name;
 		this.context = context;
 		this.list = list;
 		this.toDump = toDump;
 		this.delay = delay;
-		this.unit = unit;
 	}
 
 	public String getName() {
@@ -41,11 +39,11 @@ public class ReportContext {
 	}
 
 	public long getDelay() {
-		return delay;
+		return delay.duration();
 	}
 
 	public TimeUnit getUnit() {
-		return unit;
+		return delay.unit();
 	}
 
 }

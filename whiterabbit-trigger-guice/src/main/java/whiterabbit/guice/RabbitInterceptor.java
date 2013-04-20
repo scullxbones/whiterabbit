@@ -5,9 +5,10 @@ import java.util.concurrent.TimeUnit;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import whiterabbit.Cancelable;
+import whiterabbit.Delay;
 import whiterabbit.Rabbit;
 import whiterabbit.RabbitTimeout;
-import whiterabbit.Rabbit.Cancelable;
 
 public class RabbitInterceptor implements MethodInterceptor {
 	
@@ -30,7 +31,7 @@ public class RabbitInterceptor implements MethodInterceptor {
 			to = toAnnotation.value() > 0 ? toAnnotation.value() : defaultTimeout;
 			unit = toAnnotation.unit();
 		}
-		Cancelable cancelable = rabbit.registerTimeout(to, unit);
+		Cancelable cancelable = rabbit.register().timeout(Delay.of(to, unit)).build();
 		try
 		{
 			return invocation.proceed();
