@@ -1,17 +1,18 @@
 package whiterabbit.guice;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import whiterabbit.Delay;
 import whiterabbit.Rabbit;
-import whiterabbit.RabbitTest;
-import whiterabbit.TestReporter;
+import whiterabbit.ReportContext;
+import whiterabbit.Reporter;
 import whiterabbit.impl.RabbitImpl;
 
 import com.google.inject.AbstractModule;
@@ -23,7 +24,8 @@ public class InterceptorTest {
 
 	private Injector injector;
 	private Rabbit rabbit;
-	private final TestReporter testReporter = new TestReporter();
+	
+	private Reporter testReporter = mock(Reporter.class);
 	
 	private Module rabbitMod;
 	private Module testModule =  new AbstractModule() {
@@ -37,8 +39,8 @@ public class InterceptorTest {
 	@Before
  	public void setUp()
 	{
-		rabbit = RabbitImpl.builder().reportingTo(testReporter).withTickLength(50).buildAndStart();
-		rabbitMod = new RabbitModule(rabbit,100,TimeUnit.MILLISECONDS);
+		rabbit = RabbitImpl.builder().reportingTo(testReporter).tick(50).buildAndStart();
+		rabbitMod = new RabbitModule(rabbit,Delay.millis(100));
 	}
 	
 	@After
@@ -54,7 +56,10 @@ public class InterceptorTest {
 		IService service = injector.getInstance(TestService.class);
 		service.setMillisSleep(75);
 		service.invoke();
-		assertThat(testReporter.await(150),is(false));
+		Thread.sleep(150);
+		verify(testReporter).reportCancellation(any(ReportContext.class));
+		verify(testReporter,never()).reportTimeout(any(ReportContext.class));
+		//assertThat(testReporter.await(150),is(false));
 	}
 	
 	
@@ -65,7 +70,10 @@ public class InterceptorTest {
 		IService service = injector.getInstance(TestService.class);
 		service.setMillisSleep(150);
 		service.invoke();
-		assertThat(testReporter.await(150),is(true));
-		RabbitTest.assertReportWasCalled(testReporter, 100);
+		Thread.sleep(150);
+		verify(testReporter).reportTimeout(any(ReportContext.class));
+		verify(testReporter,never()).reportCancellation(any(ReportContext.class));
+		//assertThat(testReporter.await(150),is(true));
+		//RabbitTest.assertReportWasCalled(testReporter, 100);
 	}
 }

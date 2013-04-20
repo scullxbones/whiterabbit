@@ -21,7 +21,7 @@ public class RabbitTest {
 	public void setUp()
 	{
 		rabbit = RabbitImpl.builder()
-									 .withTickLength(10)
+									 .tick(10)
 									 .reportingTo(mockReporter).buildAndStart();
 	}
 

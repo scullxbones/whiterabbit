@@ -126,10 +126,10 @@ public class RabbitFilter implements Filter {
 			wheelSize = Integer.parseInt(wheelSizeParam);
 			
 		rabbit = RabbitImpl.builder()
-								.withSize(wheelSize)
-								.withTickLength(tickLength)
-								.ofUnit(tickUnit)
-								.reportingToIterable(reporters)
+								.size(wheelSize)
+								.tick(tickLength)
+								.unit(tickUnit)
+								.reportingTo(reporters)
 								.buildAndStart();
 		
 		String to = filterConfig.getInitParameter(TIMEOUT_INIT_PARAMETER);

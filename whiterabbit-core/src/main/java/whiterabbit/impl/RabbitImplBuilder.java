@@ -7,8 +7,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import whiterabbit.Rabbit;
-import whiterabbit.Reporter;
 import whiterabbit.Rabbit.Builder;
+import whiterabbit.Reporter;
 import whiterabbit.io.netty.util.HashedWheelTimer;
 
 class RabbitImplBuilder implements Builder {
@@ -25,44 +25,38 @@ class RabbitImplBuilder implements Builder {
 	RabbitImplBuilder() {}
 
 	@Override
-	public Builder withTickLength(long tick) {
+	public Builder tick(long tick) {
 		this.tickDuration = tick;
 		return this;
 	}
 
 	@Override
-	public Builder ofUnit(TimeUnit unit) {
+	public Builder unit(TimeUnit unit) {
 		this.unit = unit;
 		return this;
 	}
 
 	@Override
-	public Builder withSize(int wheelSize) {
+	public Builder size(int wheelSize) {
 		this.wheelSize = wheelSize;
 		return this;
 	}
 
 	@Override
-	public Builder usingThreadFactory(ThreadFactory factory) {
+	public Builder threadFactory(ThreadFactory factory) {
 		this.factory = factory;
 		return this;
 	}
 	
 	@Override
-	public Builder reportingTo(Reporter reporter) {
-		reporters.add(reporter);
-		return this;
-	}
-	
-	@Override
-	public Builder reportingToSeveral(Reporter... reporters) {
+	public Builder reportingTo(Reporter... reporters) {
 		for(Reporter reporter : reporters)
 			this.reporters.add(reporter);
 		return this;
 	}
 	
 	@Override
-	public Builder reportingToIterable(Iterable<Reporter> reporters) {
+	public Builder reportingTo(Iterable<Reporter> reporters) {
 		for(Reporter reporter : reporters)
 			this.reporters.add(reporter);
 		return this;
@@ -76,5 +70,5 @@ class RabbitImplBuilder implements Builder {
 							.start();
 		return instance;
 	}
-	
+
 }

@@ -12,26 +12,27 @@ import whiterabbit.RabbitTimeout;
 
 public class RabbitInterceptor implements MethodInterceptor {
 	
-	private final long defaultTimeout;
 	private final Rabbit rabbit;
-	private final TimeUnit defaultTimeUnit;
+	private Delay defaultDelay;
 	
-	public RabbitInterceptor(Rabbit rabbit, long defaultTimeout, TimeUnit defaultTimeUnit)
+	public RabbitInterceptor(Rabbit rabbit, Delay defaultDelay)
 	{
 		this.rabbit = rabbit;
-		this.defaultTimeUnit = defaultTimeUnit;
-		this.defaultTimeout = defaultTimeout;
+		this.defaultDelay = defaultDelay;
 	}
 	
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		long to = defaultTimeout;
-		TimeUnit unit = defaultTimeUnit;
+		long to = defaultDelay.duration();
+		TimeUnit unit = defaultDelay.unit();
 		if (invocation.getMethod().isAnnotationPresent(RabbitTimeout.class)) {
 			RabbitTimeout toAnnotation = invocation.getMethod().getAnnotation(RabbitTimeout.class);
-			to = toAnnotation.value() > 0 ? toAnnotation.value() : defaultTimeout;
+			to = toAnnotation.value() > 0 ? toAnnotation.value() : defaultDelay.duration();
 			unit = toAnnotation.unit();
 		}
-		Cancelable cancelable = rabbit.register().timeout(Delay.of(to, unit)).build();
+		Cancelable cancelable = rabbit.register()
+									  .timeout(Delay.of(to, unit))
+									  .named(byInvocation(invocation))
+									  .build();
 		try
 		{
 			return invocation.proceed();
@@ -40,5 +41,9 @@ public class RabbitInterceptor implements MethodInterceptor {
 		{
 			cancelable.cancel();
 		}
+	}
+
+	private String byInvocation(MethodInvocation invocation) {
+		return String.format("%s.%s", invocation.getThis().getClass().getName(),invocation.getMethod().getName());
 	} 
 }

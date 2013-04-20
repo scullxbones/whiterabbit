@@ -1,7 +1,6 @@
 package whiterabbit.guice;
 
-import java.util.concurrent.TimeUnit;
-
+import whiterabbit.Delay;
 import whiterabbit.Rabbit;
 import whiterabbit.RabbitTimeout;
 
@@ -10,21 +9,19 @@ import com.google.inject.matcher.Matchers;
 
 public class RabbitModule extends AbstractModule {
 
-	private final long defaultTimeout;
-	private final TimeUnit defaultUnit;
 	private final Rabbit rabbit;
+	private final Delay defaultDelay;
 
-	public RabbitModule(Rabbit rabbit, long defaultTimeout, TimeUnit defaultUnit)
+	public RabbitModule(Rabbit rabbit, Delay defaultDelay)
 	{
+		this.defaultDelay = defaultDelay;
 		if (rabbit == null)
 			throw new IllegalArgumentException("Rabbit instance cannot be null");
 		this.rabbit = rabbit;
-		this.defaultTimeout = defaultTimeout;
-		this.defaultUnit = defaultUnit;
 	}
 	
   protected void configure() {
-  	RabbitInterceptor interceptor = new RabbitInterceptor(rabbit,defaultTimeout,defaultUnit);
+  	RabbitInterceptor interceptor = new RabbitInterceptor(rabbit,defaultDelay);
   	requestInjection(interceptor);
     bindInterceptor(Matchers.any(), Matchers.annotatedWith(RabbitTimeout.class), interceptor);   
   } 	

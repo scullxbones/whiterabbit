@@ -30,4 +30,9 @@ public class TestReporter implements Reporter {
 		return latch.await(maxTimeInMillis, TimeUnit.MILLISECONDS);
 	}
 
+	@Override
+	public void reportCancellation(ReportContext context) {
+		// NO-OP
+	}
+
 }

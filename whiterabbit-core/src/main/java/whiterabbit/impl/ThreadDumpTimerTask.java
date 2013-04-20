@@ -19,6 +19,7 @@ class ThreadDumpTimerTask implements TimerTask, Cancelable
 	private final Map<String, Object> context;
 	private final String name;
 	private final Iterable<Reporter> reporters;
+	private final AtomicBoolean timedOut = new AtomicBoolean(false);
 
 	public ThreadDumpTimerTask(String name, Map<String,Object> context, Thread toDump, Delay delay, Iterable<Reporter> reporters)
 	{
@@ -34,6 +35,7 @@ class ThreadDumpTimerTask implements TimerTask, Cancelable
 	{
 		if (timeout.isExpired() && !cancelled.get())
 		{
+			timedOut.set(true);
 			ReportContext ctx = 
 					new ReportContext(name,context,Arrays.asList(toDump.getStackTrace()), toDump, delay);
 			for(Reporter reporter : reporters)
@@ -43,7 +45,13 @@ class ThreadDumpTimerTask implements TimerTask, Cancelable
 
 	@Override
 	public void cancel() {
-		cancelled.set(true);
+		if (!timedOut.get()) {
+			cancelled.set(true);
+			ReportContext ctx = 
+					new ReportContext(name,context,Arrays.asList(toDump.getStackTrace()), toDump, delay);
+			for(Reporter reporter : reporters)
+				reporter.reportCancellation(ctx);
+		}
 	}
 	
 }

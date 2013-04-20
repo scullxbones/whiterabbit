@@ -49,4 +49,9 @@ public class Slf4jReporter implements Reporter {
 		logger.info(buffer.toString());
 	}
 
+	@Override
+	public void reportCancellation(ReportContext context) {
+		// No-op
+	}
+
 }

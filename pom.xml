@@ -31,10 +31,11 @@
   <modules>
     <module>whiterabbit-core</module>
     <module>whiterabbit-formatters</module>
+    
     <module>whiterabbit-reporter-slf4j</module>
-    <module>whiterabbit-trigger-web</module>
     <module>whiterabbit-trigger-spring</module>
     <module>whiterabbit-trigger-guice</module>
+    <module>whiterabbit-reporter-metrics</module>
   </modules>
 
   <dependencies>

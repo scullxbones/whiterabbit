@@ -30,4 +30,10 @@ public class FilterTestReporter implements Reporter
 		collectedContexts.clear();
 	}
 
+
+	@Override
+	public void reportCancellation(ReportContext context) {
+		// No-op
+	}
+
 }

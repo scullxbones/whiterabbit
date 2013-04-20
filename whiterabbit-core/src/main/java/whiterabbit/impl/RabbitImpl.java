@@ -46,7 +46,7 @@ public class RabbitImpl implements Rabbit {
 	}
 	
 	public <T> WrappedBuilder<T> wrap(Callable<T> callable) {
-		return new ThreadDumpTimerTaskWrappedBuilder<T>(callable, reporters, timer);
+		return new ThreadDumpTimerTaskWrappedBuilder<T>(callable, reporters,timer);
 	}
 
 }
