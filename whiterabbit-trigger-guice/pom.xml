@@ -23,17 +23,20 @@
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <version>3.0</version>
+      <scope>provided</scope>
     </dependency> 
     <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
       <version>1.0</version>
+      <scope>provided</scope>
     </dependency> 
     <dependency>             
     	<groupId>javax.inject</groupId>             
     	<artifactId>javax.inject</artifactId>             
     	<version>1</version>         
-    	</dependency>    
+    	<scope>provided</scope>
+    </dependency>    
     <dependency>
       <groupId>${pom.groupId}</groupId>
       <artifactId>whiterabbit-core</artifactId>

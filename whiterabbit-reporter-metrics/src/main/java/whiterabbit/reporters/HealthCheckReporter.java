@@ -60,7 +60,7 @@ public class HealthCheckReporter extends HealthCheck implements Reporter {
 
 	private BigDecimal getRatio() {
 		long total = timeouts.get() + cancellations.get();
-		return new BigDecimal(timeouts.get())
+		return new BigDecimal(cancellations.get())
 				.divide(new BigDecimal(total),RoundingMode.HALF_UP)
 				.multiply(BigDecimal.valueOf(100));
 	}

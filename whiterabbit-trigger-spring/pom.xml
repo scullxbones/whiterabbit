@@ -24,5 +24,17 @@
       <artifactId>whiterabbit-core</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-webmvc</artifactId>
+    	<version>3.2.2.RELEASE</version>
+    	<scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>javax.servlet</groupId>
+    	<artifactId>javax.servlet-api</artifactId>
+    	<version>3.1-b08</version>
+    	<scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>
